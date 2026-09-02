@@ -10,18 +10,6 @@
 
 **FSR Pressure Sensing · SFS Sensor Optimization · SVM · COP Analysis · Ultrasonic Posture Estimation · Raspberry Pi 5 · Arduino · Linear Actuator**
 
-
-
-![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-5-A22846?style=flat-square&logo=raspberrypi&logoColor=white)
-![Arduino](https://img.shields.io/badge/Arduino-Mega%20%2F%20Uno-00979D?style=flat-square&logo=arduino&logoColor=white)
-![PyQt5](https://img.shields.io/badge/UI-PyQt5-41CD52?style=flat-square)
-![SVM](https://img.shields.io/badge/AI-RBF--SVM-1F6FEB?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Prototype-F5A623?style=flat-square)
-
-<img width="1365" height="685" alt="image" src="https://github.com/user-attachments/assets/36d00e82-b5d4-4219-a8ff-6690f630aab6" />
-
-
 Seat-ID는 16채널 체압센서와 등·목 초음파센서를 이용해 착석 사용자를 식별하고, 사용자별 시트 설정 적용과 실시간 자세 분석·경고·운전 리포트를 제공하는 Raspberry Pi 기반 스마트 차량 시트 시스템입니다.
 
 카메라를 사용하지 않고 체압과 거리 데이터를 활용하며, 사용자 식별부터 좌석 개인화, 자세 모니터링, 액추에이터 제어까지 하나의 시스템에서 수행합니다.
