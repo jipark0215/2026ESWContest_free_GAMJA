@@ -361,6 +361,10 @@ chmod +x run_neck_monitor.sh
 - 액추에이터 APPLY·RESET 및 주차 전환 시 기준 위치 복귀 기능을 구현했습니다.
 - 사용자별 시트 설정과 자세 기준을 저장하여 동일한 좌석을 개인화된 환경으로 사용할 수 있습니다.
 - 운전 세션별 자세 점수와 경고를 누적하여 리포트로 제공합니다.
+  
+  [선행연구와의 비교]
+  <img width="1315" height="1017" alt="image" src="https://github.com/user-attachments/assets/d379cbdb-898b-4864-ad25-6ec067e6f117" />
+
 
 ## 11. 역할 분담
 
