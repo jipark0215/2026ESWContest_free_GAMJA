@@ -171,76 +171,72 @@ flowchart TB
 | 데이터 저장 | CSV, JSON, NPY |
 | 실행 관리 | Bash Shell Script |
 
----
-
 ## 6. 주요 파일 구성
 
-현재 실행 파일은 Raspberry Pi 운용 환경에서의 상대경로 호환성을 위해 저장소 최상위 경로에 배치되어 있습니다.
+프로젝트의 소스코드는 기능에 따라 `Data_processing`, `FSR`, `Ultrasonic`, `Hardware`, `UI` 디렉터리로 구분하여 구성하였습니다.
 
-### UI 및 통합 제어
-
-| 파일 | 역할 |
-|---|---|
-| `app.py` | PyQt5 터치 UI, 사용자 등록·식별, 화면 상태 전환, 자세 경고 및 운전 리포트를 관리합니다. |
-| `hardware_bridge.py` | UI에서 발생한 사용자 선택·주차·종료 이벤트를 액추에이터 제어부로 전달합니다. |
-| `smart_chair_actuator_module.py` | 사용자 시트 설정을 액추에이터 구동시간으로 변환하고 APPLY·RESET을 수행합니다. |
-| `detect_serial_roles.py` | 연결된 Arduino 장치의 역할과 시리얼 포트를 확인합니다. |
-
-### 체압 분석 및 SVM
+### 데이터 전처리
 
 | 파일 | 역할 |
 |---|---|
-| `real_time_prediction_rasp.py` | 16채널 체압 보정, 사용자 식별 SVM, 자세 분류 SVM 및 좌우 하중 분석을 수행합니다. |
-| `pressure_database.py` | 신규 사용자의 대표 체압값을 수집하여 사용자 식별 DB를 생성합니다. |
-| `train_user_model.py` | 등록 사용자 식별 SVM과 입력 스케일러를 학습·저장합니다. |
-| `collect_posture_data.py` | 5종 자세 분류 SVM에 사용할 체압 데이터를 수집합니다. |
+| `merge_posture_data.py` | 사용자 및 자세별로 수집된 자세 데이터를 하나의 학습 데이터셋으로 통합합니다. |
+| `review_dataset.py` | 수집된 자세 데이터의 분포와 이상 데이터를 검토합니다. |
+| `remove_flagged.py` | 데이터 검토 과정에서 이상 데이터로 표시된 샘플을 제거합니다. |
+| `similarity_dedup.py` | 유사도가 높은 중복 데이터를 탐색하고 학습 데이터셋을 정리합니다. |
 
-### 자세 데이터 정제
-
-| 파일 | 역할 |
-|---|---|
-| `merge_posture_data.py` | 자세별 또는 사용자별로 수집된 학습 데이터를 통합합니다. |
-| `review_dataset.py` | 자세 학습 데이터의 분포와 이상 데이터를 검토합니다. |
-| `remove_flagged.py` | 검토 과정에서 표시된 이상 데이터를 제거합니다. |
-| `similarity_dedup.py` | 지나치게 유사하거나 중복된 학습 데이터를 정리합니다. |
-
-### 초음파 자세 분석
+### FSR 기반 사용자·자세 분석
 
 | 파일 | 역할 |
 |---|---|
-| `spine_curve_monitor_4ch_no_s4.py` | 등 4채널 초음파센서로 등 곡률과 구부러짐 상태를 분석합니다. |
-| `neck_cva_monitor_2ch.py` | 목 2채널 초음파센서로 전방 이동과 자세 변화 상태를 분석합니다. |
+| `arduino_mega.ino` | Arduino Mega에서 16채널 FSR 압력센서 데이터를 측정하고 Raspberry Pi로 전송합니다. |
+| `real_time_prediction_rasp.py` | Raspberry Pi에서 체압 데이터를 수신하여 사용자 식별 및 자세 분류를 실시간으로 수행합니다. |
 
-### Arduino 펌웨어
-
-| 파일 | 역할 |
-|---|---|
-| `arduino_mega.ino` | 16채널 FSR 압력센서 데이터를 측정·전송합니다. |
-| `arduino_back.ino` | 등 자세 측정용 초음파센서를 제어합니다. |
-| `arduino_neck_2ch.ino` | 목 자세 측정용 2채널 초음파센서를 제어합니다. |
-| `smart_chair_arduino_3.ino` | 시트와 등받이 액추에이터를 제어합니다. |
-| `butten_code.ino` | 주행 시작·주차·주행 종료 물리 버튼 입력을 처리합니다. |
-
-### 실행 스크립트
+#### 자세 분류
 
 | 파일 | 역할 |
 |---|---|
-| `run_all.sh` | 등·목 센서 분석, 액추에이터 제어 및 PyQt5 UI를 통합 실행합니다. |
-| `run_app.sh` | PyQt5 메인 UI를 실행합니다. |
-| `run_actuator.sh` | 액추에이터 제어 브리지를 실행합니다. |
+| `collect_posture_data.py` | 5종 착석 자세 분류를 위한 체압 데이터를 수집합니다. |
+| `svm_model.pkl` | 체압 데이터를 기반으로 5종 착석 자세를 분류하는 SVM 모델입니다. |
+| `scaler.pkl` | 자세 분류 모델의 입력 데이터 표준화를 위한 스케일러입니다. |
+
+#### 사용자 식별
+
+| 파일 | 역할 |
+|---|---|
+| `pressure_database.py` | 사용자별 대표 체압 데이터를 수집하여 사용자 식별 데이터베이스를 구축합니다. |
+| `train_user_model.py` | 등록된 사용자의 체압 데이터를 기반으로 사용자 식별 모델을 학습하고 저장합니다. |
+| `user_model.pkl` | 등록 사용자의 체압 패턴을 기반으로 사용자를 식별하는 모델입니다. |
+| `user_scaler.pkl` | 사용자 식별 모델의 입력 데이터 표준화를 위한 스케일러입니다. |
+
+### 초음파 기반 자세 분석
+
+| 파일 | 역할 |
+|---|---|
+| `arduino_back*.ino` | 등 부위의 초음파 센서를 제어하고 거리 데이터를 수집합니다. |
+| `arduino_neck*.ino` | 목 부위의 초음파 센서를 제어하고 거리 데이터를 수집합니다. |
+| `spine*.py` | 등 부위의 초음파 거리 데이터를 기반으로 등 굽힘 및 자세 변화를 분석합니다. |
+| `neck*.py` | 목 부위의 초음파 거리 데이터를 기반으로 전방 이동 및 자세 변화를 분석합니다. |
+
+### 하드웨어 제어
+
+| 파일 | 역할 |
+|---|---|
+| `detect_serial_roles.py` | 연결된 Arduino 장치의 시리얼 포트를 확인하고 각 장치의 역할을 식별합니다. |
+| `hardware_bridge.py` | UI 및 상위 프로그램의 제어 명령을 액추에이터 제어부로 전달합니다. |
+| `smart_chair_actuator_module.py` | 사용자별 저장된 시트 설정을 액추에이터 구동시간으로 변환하고 APPLY·RESET 동작을 수행합니다. |
+| `smart_chair_arduino_3.ino` | 시트 및 등받이 액추에이터의 실제 구동을 제어합니다. |
+
+### 사용자 인터페이스 및 시스템 실행
+
+| 파일 | 역할 |
+|---|---|
+| `app.py` | PyQt5 기반 터치 UI를 구성하고 사용자 등록·식별, 화면 전환, 자세 경고 및 운전 리포트를 통합 관리합니다. |
+| `butten_code.ino` | 주행 시작·주차·주행 종료 등의 물리 버튼 입력을 처리합니다. |
+| `run_app.sh` | 메인 PyQt5 UI를 실행합니다. |
+| `run_actuator.sh` | 액추에이터 제어 프로그램을 실행합니다. |
+| `run_all.sh` | UI, 액추에이터 및 자세 모니터링 프로그램을 통합 실행합니다. |
 | `run_back_ultrasonic.sh` | 등 초음파 자세 분석 프로그램을 실행합니다. |
 | `run_neck_monitor.sh` | 목 초음파 자세 분석 프로그램을 실행합니다. |
-
-### 학습 모델 및 기준 데이터
-
-| 파일 | 역할 |
-|---|---|
-| `user_model.pkl` | 등록 사용자 식별 SVM 모델 |
-| `user_scaler.pkl` | 사용자 식별 입력값 표준화 스케일러 |
-| `svm_model.pkl` | 5종 착석 자세 분류 SVM 모델 |
-| `scaler.pkl` | 자세 분류 입력값 표준화 스케일러 |
-| `selected_baseline.npy` | 체압센서별 기준압력 |
-| `selected_sensor_positions.csv` | 자세 분류에 사용하는 16개 센서 위치 정보 |
 
 ---
 
