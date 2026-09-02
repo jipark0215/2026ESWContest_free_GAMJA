@@ -6,6 +6,8 @@
 **2026 임베디드소프트웨어 경진대회 자유공모 부문 출품작**  
 **Team GAMJA**
 
+`Python` `scikit-learn` `SVM` `Arduino` `Raspberry Pi` `FSR-406` `HC-SR04P`
+
 **FSR Pressure Sensing · SFS Sensor Optimization · SVM · COP Analysis · Ultrasonic Posture Estimation · Raspberry Pi 5 · Arduino · Linear Actuator**
 
 
