@@ -1,4 +1,4 @@
-# Seat-ID — A Smarter Seat That Understands You.
+# Seat-ID — Intelligent Car Seat for Personalized Seating
 
 
 ### 체압·초음파 기반 운전자 맞춤형 스마트 시트
