@@ -6,6 +6,10 @@
 **2026 임베디드소프트웨어 경진대회 자유공모 부문 출품작**  
 **Team GAMJA**
 
+**FSR Pressure Sensing · SFS Sensor Optimization · SVM · COP Analysis · Ultrasonic Posture Estimation · Raspberry Pi 5 · Arduino · Linear Actuator**
+
+
+
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-5-A22846?style=flat-square&logo=raspberrypi&logoColor=white)
 ![Arduino](https://img.shields.io/badge/Arduino-Mega%20%2F%20Uno-00979D?style=flat-square&logo=arduino&logoColor=white)
