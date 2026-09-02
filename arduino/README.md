@@ -29,10 +29,7 @@ Seat-ID 시스템의 센서 데이터 수집 및 시트 제어를 담당하는 A
 ```text
 [Arduino Mega]
      │
-     └─ 16-Element FSR-406
-             │
-             ▼
-      Pressure Data
+     └─ 16-Element FSR-406 -> Pressure Data
 
 [Arduino Uno]
      ├─ HC-SR04 × 5 → Back / Body
