@@ -32,33 +32,56 @@ Seat-ID는 16채널 체압센서와 등·목 초음파센서를 이용해 착석
 | 운전 리포트 | 주행 중 자세 점수·상태·경고를 기록하고 세션 종료 후 리포트를 제공합니다. |
 | 물리 버튼 연동 | 주행 시작(S)·주차(P)·주행 종료(E) 버튼으로 시스템 상태를 제어합니다. |
 
----
-
 ## 2. 시스템 구성
 
 ```mermaid
-flowchart LR
-    USER["사용자 정보<br/>이름·시트 위치·등받이 각도"]
+flowchart TB
 
-    FSR["16채널 FSR<br/>체압센서"]
-    BACK["등 4채널<br/>초음파센서"]
-    NECK["목 2채널<br/>초음파센서"]
+    %% ─────────────── INPUT ───────────────
+    subgraph INPUT["① 사용자 및 센서 입력"]
+        USER["사용자 정보<br/>이름 · 시트 위치 · 등받이 각도"]
 
-    ARD1["Arduino Mega"]
-    ARD2["Arduino Uno"]
-    RPI["Raspberry Pi 5"]
+        FSR["16채널 FSR<br/>체압 센서"]
+        BACK["등 4채널<br/>초음파 센서"]
+        NECK["목 2채널<br/>초음파 센서"]
+    end
 
-    PRESSURE["사용자 식별 SVM<br/>5종 자세 분류<br/>체압 분포 분석"]
-    ULTRA["등 곡률 분석<br/>목 전방 이동 분석"]
-    UI["PyQt5 터치 UI<br/>상태 전환·경고·리포트"]
-    CONTROL["액추에이터 제어<br/>APPLY·RESET"]
-    OUTPUT["CSV 주행 기록<br/>운전 리포트"]
+    %% ─────────────── EMBEDDED ───────────────
+    subgraph EMBEDDED["② 임베디드 데이터 수집"]
+        ARD1["Arduino Mega<br/>FSR 데이터 수집"]
+        ARD2["Arduino Uno<br/>초음파 데이터 수집"]
+        RPI["Raspberry Pi 5<br/>데이터 통합 · 실시간 처리"]
+    end
+
+    %% ─────────────── ANALYSIS ───────────────
+    subgraph ANALYSIS["③ 실시간 데이터 분석"]
+        PRESSURE["SFS + SVM 기반 체압 분석<br/>사용자 식별 · 5종 자세 분류<br/>좌우 하중 분석"]
+
+        ULTRA["초음파 분석<br/>등 곡률 분석 · 목 전방 이동 분석"]
+    end
+
+    %% ─────────────── APPLICATION ───────────────
+    subgraph APPLICATION["④ 상태 판단 및 시스템 제어"]
+        UI["PyQt5 터치 UI<br/>상태 전환 · 자세 점수 · 경고"]
+
+        CONTROL["시트 액추에이터 제어<br/>APPLY · RESET"]
+    end
+
+    %% ─────────────── OUTPUT ───────────────
+    subgraph OUTPUT["⑤ 결과 및 기록"]
+        REPORT["CSV 주행 기록<br/>운전 리포트"]
+    end
+
+    %% ─────────────── FLOW ───────────────
 
     USER --> UI
 
-    FSR --> ARD1 --> RPI
-    BACK --> ARD2 --> RPI
+    FSR --> ARD1
+    BACK --> ARD2
     NECK --> ARD2
+
+    ARD1 --> RPI
+    ARD2 --> RPI
 
     RPI --> PRESSURE
     RPI --> ULTRA
@@ -67,9 +90,39 @@ flowchart LR
     ULTRA --> UI
 
     UI --> CONTROL
-    UI --> OUTPUT
-```
+    UI --> REPORT
 
+    %% ─────────────── STYLE ───────────────
+
+    %% Input
+    style USER fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style FSR fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style BACK fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style NECK fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+
+    %% Embedded
+    style ARD1 fill:#DCEAF7,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style ARD2 fill:#DCEAF7,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style RPI fill:#BFD7EA,stroke:#1F4E79,stroke-width:3px,color:#1F2937
+
+    %% Analysis
+    style PRESSURE fill:#1F4E79,stroke:#163A5C,stroke-width:3px,color:#FFFFFF
+    style ULTRA fill:#DCEAF7,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+
+    %% Application
+    style UI fill:#BFD7EA,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+    style CONTROL fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+
+    %% Output
+    style REPORT fill:#EAF2F8,stroke:#1F4E79,stroke-width:2px,color:#1F2937
+
+    %% Subgraph Background
+    style INPUT fill:#F7F9FC,stroke:#A9C4DD,stroke-width:1px,color:#1F4E79
+    style EMBEDDED fill:#F7F9FC,stroke:#A9C4DD,stroke-width:1px,color:#1F4E79
+    style ANALYSIS fill:#F7F9FC,stroke:#A9C4DD,stroke-width:1px,color:#1F4E79
+    style APPLICATION fill:#F7F9FC,stroke:#A9C4DD,stroke-width:1px,color:#1F4E79
+    style OUTPUT fill:#F7F9FC,stroke:#A9C4DD,stroke-width:1px,color:#1F4E79
+```
 ### 시스템 동작 흐름
 
 1. Arduino가 체압·등·목 센서값을 수집하여 Raspberry Pi로 전달합니다.
